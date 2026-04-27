@@ -54,7 +54,7 @@
       "image": {
         "repository": "ghcr.io/carlo1010/gruppopiccirillo-commercianti-frontend",
         "tag": "main",
-        "pullPolicy": "IfNotPresent"
+        "pullPolicy": "Always"
       },
       "containerPort": 3000,
       "service": {
@@ -114,7 +114,7 @@
       "image": {
         "repository": "ghcr.io/carlo1010/gruppopiccirillo-commercianti-cms",
         "tag": "main",
-        "pullPolicy": "IfNotPresent"
+        "pullPolicy": "Always"
       },
       "containerPort": 1337,
       "service": {
