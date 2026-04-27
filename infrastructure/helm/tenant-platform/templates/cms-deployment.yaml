@@ -88,6 +88,8 @@ spec:
           volumeMounts:
             - name: cms-data
               mountPath: /app/.tmp
+            - name: cms-data
+              mountPath: /app/dist/.tmp
           {{- end }}
           resources:
             {{- toYaml .Values.apps.cms.resources | nindent 12 }}
