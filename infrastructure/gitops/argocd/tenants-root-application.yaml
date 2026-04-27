@@ -8,7 +8,7 @@ metadata:
 spec:
   project: tenant-platform
   source:
-    repoURL: https://git.example.com/platform/sito-commercianti.git
+    repoURL: https://github.com/carlo1010/gruppopiccirillo-commercianti-gitops.git
     targetRevision: main
     path: infrastructure/gitops/tenants
     directory:
