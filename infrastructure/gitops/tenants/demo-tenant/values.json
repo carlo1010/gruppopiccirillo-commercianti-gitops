@@ -151,6 +151,7 @@
         "APP_KEYS": "demo-key-1,demo-key-2,demo-key-3,demo-key-4",
         "ADMIN_JWT_SECRET": "demo-admin-jwt-secret",
         "API_TOKEN_SALT": "demo-api-token-salt",
+        "JWT_SECRET": "demo-users-permissions-jwt-secret",
         "TRANSFER_TOKEN_SALT": "demo-transfer-token-salt",
         "STRAPI_RUN_CORE_SEEDS": "false",
         "STRAPI_AUTO_ENABLE_PUBLIC_READ_PERMISSIONS": "false",
