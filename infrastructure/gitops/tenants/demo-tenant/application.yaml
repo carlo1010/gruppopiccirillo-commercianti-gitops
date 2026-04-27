@@ -27,6 +27,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: tenant-demo-tenant
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=false
       - ApplyOutOfSyncOnly=true

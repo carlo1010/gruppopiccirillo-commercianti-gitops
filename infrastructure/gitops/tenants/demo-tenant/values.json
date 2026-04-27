@@ -52,8 +52,8 @@
       "enabled": true,
       "replicas": 1,
       "image": {
-        "repository": "ghcr.io/example/gruppopiccirillo-commercianti-frontend",
-        "tag": "latest",
+        "repository": "ghcr.io/carlo1010/gruppopiccirillo-commercianti-frontend",
+        "tag": "main",
         "pullPolicy": "IfNotPresent"
       },
       "containerPort": 3000,
@@ -112,8 +112,8 @@
       "enabled": true,
       "replicas": 1,
       "image": {
-        "repository": "ghcr.io/example/gruppopiccirillo-commercianti-cms",
-        "tag": "latest",
+        "repository": "ghcr.io/carlo1010/gruppopiccirillo-commercianti-cms",
+        "tag": "main",
         "pullPolicy": "IfNotPresent"
       },
       "containerPort": 1337,
