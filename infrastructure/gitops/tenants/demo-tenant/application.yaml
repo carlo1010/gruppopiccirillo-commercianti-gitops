@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tenant-demo-tenant
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: tenant-platform
+    tenant.platform/tenant-id: "11111111-1111-1111-1111-111111111111"
+    tenant.platform/tenant-slug: "demo-tenant"
+    tenant.platform/release-channel: "stable"
+  annotations:
+    tenant.platform/display-name: "Demo Tenant"
+    tenant.platform/chart-version: "0.1.0"
+    tenant.platform/frontend-version: "latest"
+    tenant.platform/cms-version: "latest"
+    tenant.platform/release-pin: ""
+spec:
+  project: tenant-platform
+  source:
+    repoURL: https://github.com/carlo1010/gruppopiccirillo-commercianti-gitops.git
+    targetRevision: main
+    path: infrastructure/helm/tenant-platform
+    helm:
+      valueFiles:
+        - ../../gitops/tenants/demo-tenant/values.json
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tenant-demo-tenant
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=false
+      - ApplyOutOfSyncOnly=true

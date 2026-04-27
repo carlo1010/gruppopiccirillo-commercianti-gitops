@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-04-27T12:31:30.000Z",
+  "source": "manual-bootstrap",
+  "tenant": {
+    "tenantId": "11111111-1111-1111-1111-111111111111",
+    "slug": "demo-tenant",
+    "displayName": "Demo Tenant",
+    "specVersion": "1.0.0",
+    "namespace": "tenant-demo-tenant",
+    "releaseChannel": "stable",
+    "themePreset": "default",
+    "primaryDomain": "demo.95.110.143.33.nip.io",
+    "domains": [
+      "demo.95.110.143.33.nip.io"
+    ],
+    "featureFlags": {},
+    "runtimeConfig": {},
+    "labels": {},
+    "annotations": {},
+    "tls": {
+      "issuerRef": "letsencrypt-prod",
+      "secretName": "tenant-demo-tenant-tls"
+    },
+    "database": {
+      "engine": "postgres",
+      "host": "postgres.platform.svc.cluster.local",
+      "port": 5432,
+      "databaseName": "tenant_demo_tenant",
+      "credentialsSecretName": "tenant-demo-tenant-db",
+      "migrationStrategy": "job"
+    },
+    "storage": {
+      "provider": "local-pv",
+      "bucket": "tenant-media",
+      "prefix": "demo-tenant/",
+      "credentialsSecretName": "tenant-demo-tenant-storage"
+    },
+    "backup": {
+      "enabled": false,
+      "provider": "snapshot",
+      "schedule": "0 2 * * *",
+      "retentionDays": 14
+    },
+    "secretRefs": []
+  }
+}

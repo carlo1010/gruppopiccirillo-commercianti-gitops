@@ -1,0 +1,219 @@
+{
+  "tenant": {
+    "tenantId": "11111111-1111-1111-1111-111111111111",
+    "slug": "demo-tenant",
+    "displayName": "Demo Tenant",
+    "specVersion": "1.0.0",
+    "namespace": "tenant-demo-tenant",
+    "releaseChannel": "stable",
+    "themePreset": "default",
+    "primaryDomain": "demo.95.110.143.33.nip.io",
+    "domains": [
+      "demo.95.110.143.33.nip.io"
+    ],
+    "featureFlags": {},
+    "runtimeConfig": {},
+    "labels": {
+      "tenant.platform/managed-by": "platform-control-plane"
+    },
+    "annotations": {
+      "tenant.platform/updated-at": "2026-04-27T12:31:30.000Z"
+    },
+    "tls": {
+      "issuerRef": "letsencrypt-prod",
+      "secretName": "tenant-demo-tenant-tls"
+    },
+    "database": {
+      "engine": "postgres",
+      "host": "postgres.platform.svc.cluster.local",
+      "port": 5432,
+      "databaseName": "tenant_demo_tenant",
+      "credentialsSecretName": "tenant-demo-tenant-db",
+      "credentialsRef": "vault/tenants/demo-tenant/database",
+      "migrationStrategy": "job"
+    },
+    "storage": {
+      "provider": "local-pv",
+      "bucket": "tenant-media",
+      "prefix": "demo-tenant/",
+      "credentialsSecretName": "tenant-demo-tenant-storage",
+      "credentialsRef": "vault/tenants/demo-tenant/storage"
+    },
+    "backup": {
+      "enabled": false,
+      "provider": "snapshot",
+      "schedule": "0 2 * * *",
+      "retentionDays": 14
+    },
+    "secretRefs": []
+  },
+  "apps": {
+    "frontend": {
+      "enabled": true,
+      "replicas": 1,
+      "image": {
+        "repository": "ghcr.io/example/gruppopiccirillo-commercianti-frontend",
+        "tag": "latest",
+        "pullPolicy": "IfNotPresent"
+      },
+      "containerPort": 3000,
+      "service": {
+        "type": "ClusterIP",
+        "port": 80,
+        "targetPort": 3000
+      },
+      "podSecurityContext": {
+        "fsGroup": 1001
+      },
+      "securityContext": {
+        "runAsNonRoot": true,
+        "runAsUser": 1001,
+        "runAsGroup": 1001,
+        "allowPrivilegeEscalation": false,
+        "readOnlyRootFilesystem": true,
+        "capabilities": {
+          "drop": [
+            "ALL"
+          ]
+        }
+      },
+      "resources": {
+        "requests": {
+          "cpu": "100m",
+          "memory": "128Mi"
+        },
+        "limits": {
+          "cpu": "500m",
+          "memory": "512Mi"
+        }
+      },
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "envFromSecrets": [],
+      "livenessProbe": {
+        "httpGet": {
+          "path": "/",
+          "port": 3000
+        },
+        "initialDelaySeconds": 20,
+        "periodSeconds": 15
+      },
+      "readinessProbe": {
+        "httpGet": {
+          "path": "/",
+          "port": 3000
+        },
+        "initialDelaySeconds": 10,
+        "periodSeconds": 10
+      }
+    },
+    "cms": {
+      "enabled": true,
+      "replicas": 1,
+      "image": {
+        "repository": "ghcr.io/example/gruppopiccirillo-commercianti-cms",
+        "tag": "latest",
+        "pullPolicy": "IfNotPresent"
+      },
+      "containerPort": 1337,
+      "service": {
+        "type": "ClusterIP",
+        "port": 1337,
+        "targetPort": 1337
+      },
+      "podSecurityContext": {
+        "fsGroup": 1001
+      },
+      "securityContext": {
+        "runAsNonRoot": true,
+        "runAsUser": 1001,
+        "runAsGroup": 1001,
+        "allowPrivilegeEscalation": false,
+        "readOnlyRootFilesystem": false,
+        "capabilities": {
+          "drop": [
+            "ALL"
+          ]
+        }
+      },
+      "resources": {
+        "requests": {
+          "cpu": "100m",
+          "memory": "256Mi"
+        },
+        "limits": {
+          "cpu": "750m",
+          "memory": "1Gi"
+        }
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "HOST": "0.0.0.0",
+        "PORT": "1337",
+        "DATABASE_SSL": "false"
+      },
+      "envFromSecrets": [],
+      "livenessProbe": {
+        "httpGet": {
+          "path": "/_health",
+          "port": 1337
+        },
+        "initialDelaySeconds": 30,
+        "periodSeconds": 20
+      },
+      "readinessProbe": {
+        "httpGet": {
+          "path": "/_health",
+          "port": 1337
+        },
+        "initialDelaySeconds": 15,
+        "periodSeconds": 10
+      }
+    }
+  },
+  "ingress": {
+    "enabled": true,
+    "className": "nginx",
+    "annotations": {},
+    "frontend": {
+      "enabled": true,
+      "path": "/",
+      "pathType": "Prefix"
+    },
+    "cms": {
+      "enabled": false,
+      "host": "",
+      "path": "/",
+      "pathType": "Prefix",
+      "annotations": {}
+    }
+  },
+  "certificate": {
+    "enabled": true,
+    "duration": "2160h",
+    "renewBefore": "360h",
+    "privateKey": {
+      "algorithm": "RSA",
+      "size": 2048
+    }
+  },
+  "externalSecrets": {
+    "enabled": true,
+    "refreshInterval": "1h",
+    "secretStoreRef": {
+      "name": "platform-vault",
+      "kind": "ClusterSecretStore"
+    },
+    "targetSecretName": ""
+  },
+  "networkPolicy": {
+    "enabled": true,
+    "allowSameNamespace": true,
+    "ingressControllerNamespaces": [
+      "ingress-nginx"
+    ],
+    "allowDnsEgress": true,
+    "extraEgressCidrs": []
+  }
+}
