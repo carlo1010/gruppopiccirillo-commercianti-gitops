@@ -148,6 +148,10 @@
         }
       },
       "env": {
+        "APP_KEYS": "demo-key-1,demo-key-2,demo-key-3,demo-key-4",
+        "ADMIN_JWT_SECRET": "demo-admin-jwt-secret",
+        "API_TOKEN_SALT": "demo-api-token-salt",
+        "TRANSFER_TOKEN_SALT": "demo-transfer-token-salt",
         "NODE_ENV": "production",
         "HOST": "0.0.0.0",
         "PORT": "1337",

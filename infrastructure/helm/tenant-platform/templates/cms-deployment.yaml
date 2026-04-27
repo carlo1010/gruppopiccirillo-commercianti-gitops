@@ -32,6 +32,11 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.apps.cms.podSecurityContext | nindent 8 }}
+      {{- if eq .Values.tenant.database.engine "sqlite" }}
+      volumes:
+        - name: cms-data
+          emptyDir: {}
+      {{- end }}
       containers:
         - name: cms
           image: "{{ .Values.apps.cms.image.repository }}:{{ .Values.apps.cms.image.tag }}"
@@ -78,6 +83,11 @@ spec:
             - secretRef:
                 name: {{ . | quote }}
             {{- end }}
+          {{- end }}
+          {{- if eq .Values.tenant.database.engine "sqlite" }}
+          volumeMounts:
+            - name: cms-data
+              mountPath: /app/.tmp
           {{- end }}
           resources:
             {{- toYaml .Values.apps.cms.resources | nindent 12 }}
