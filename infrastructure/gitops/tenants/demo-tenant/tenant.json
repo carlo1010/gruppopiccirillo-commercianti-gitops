@@ -9,9 +9,9 @@
     "namespace": "tenant-demo-tenant",
     "releaseChannel": "stable",
     "themePreset": "default",
-    "primaryDomain": "demo.95.110.143.33.nip.io",
+    "primaryDomain": "commercianti.carloiodice.it",
     "domains": [
-      "demo.95.110.143.33.nip.io"
+      "commercianti.carloiodice.it"
     ],
     "featureFlags": {},
     "runtimeConfig": {},
