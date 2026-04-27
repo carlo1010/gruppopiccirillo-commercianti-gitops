@@ -24,11 +24,11 @@
       "secretName": "tenant-demo-tenant-tls"
     },
     "database": {
-      "engine": "postgres",
+      "engine": "sqlite",
       "host": "postgres.platform.svc.cluster.local",
       "port": 5432,
       "databaseName": "tenant_demo_tenant",
-      "credentialsSecretName": "tenant-demo-tenant-db",
+      "credentialsSecretName": "",
       "credentialsRef": "vault/tenants/demo-tenant/database",
       "migrationStrategy": "job"
     },

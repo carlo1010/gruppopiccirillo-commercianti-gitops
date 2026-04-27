@@ -65,13 +65,20 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
+          {{- $envFromSecrets := list -}}
+          {{- if and (ne .Values.tenant.database.engine "sqlite") .Values.tenant.database.credentialsSecretName }}
+          {{- $envFromSecrets = append $envFromSecrets .Values.tenant.database.credentialsSecretName -}}
+          {{- end }}
+          {{- range .Values.apps.cms.envFromSecrets }}
+          {{- $envFromSecrets = append $envFromSecrets . -}}
+          {{- end }}
+          {{- if gt (len $envFromSecrets) 0 }}
           envFrom:
-            - secretRef:
-                name: {{ .Values.tenant.database.credentialsSecretName | quote }}
-            {{- range .Values.apps.cms.envFromSecrets }}
+            {{- range $envFromSecrets }}
             - secretRef:
                 name: {{ . | quote }}
             {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.apps.cms.resources | nindent 12 }}
           securityContext:

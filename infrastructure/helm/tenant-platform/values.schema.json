@@ -73,7 +73,7 @@
           "properties": {
             "engine": {
               "type": "string",
-              "enum": ["postgres", "mysql"]
+              "enum": ["postgres", "mysql", "sqlite"]
             },
             "host": {
               "type": "string"
@@ -91,7 +91,7 @@
             },
             "credentialsSecretName": {
               "type": "string",
-              "minLength": 1
+              "minLength": 0
             },
             "migrationStrategy": {
               "type": "string",
