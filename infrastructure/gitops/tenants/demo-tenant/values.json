@@ -152,9 +152,11 @@
         "ADMIN_JWT_SECRET": "demo-admin-jwt-secret",
         "API_TOKEN_SALT": "demo-api-token-salt",
         "TRANSFER_TOKEN_SALT": "demo-transfer-token-salt",
+        "HOME": "/tmp",
         "NODE_ENV": "production",
         "HOST": "0.0.0.0",
         "PORT": "1337",
+        "DATABASE_FILENAME": "../../.tmp/data.db",
         "DATABASE_SSL": "false"
       },
       "envFromSecrets": [],
