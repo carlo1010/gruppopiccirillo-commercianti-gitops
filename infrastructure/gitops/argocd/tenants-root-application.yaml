@@ -13,7 +13,7 @@ spec:
     path: infrastructure/gitops/tenants
     directory:
       recurse: true
-      include: '{application.yaml,**/application.yaml}'
+      include: '{*.yaml,**/*.yaml}'
       exclude: '{*.json,**/*.json}'
   destination:
     server: https://kubernetes.default.svc

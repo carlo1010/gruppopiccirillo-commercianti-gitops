@@ -52,8 +52,8 @@
       "enabled": true,
       "replicas": 1,
       "image": {
-        "repository": "ghcr.io/carlo1010/gruppopiccirillo-commercianti-frontend",
-        "tag": "main",
+        "repository": "ttl.sh/gruppopiccirillo-commercianti-frontend",
+        "tag": "24h",
         "pullPolicy": "Always"
       },
       "containerPort": 3000,
@@ -79,12 +79,12 @@
       },
       "resources": {
         "requests": {
-          "cpu": "100m",
-          "memory": "128Mi"
+          "cpu": "50m",
+          "memory": "64Mi"
         },
         "limits": {
-          "cpu": "500m",
-          "memory": "512Mi"
+          "cpu": "250m",
+          "memory": "256Mi"
         }
       },
       "env": {
@@ -112,8 +112,8 @@
       "enabled": true,
       "replicas": 1,
       "image": {
-        "repository": "ghcr.io/carlo1010/gruppopiccirillo-commercianti-cms",
-        "tag": "main",
+        "repository": "ttl.sh/gruppopiccirillo-commercianti-cms",
+        "tag": "24h",
         "pullPolicy": "Always"
       },
       "containerPort": 1337,
@@ -139,12 +139,12 @@
       },
       "resources": {
         "requests": {
-          "cpu": "100m",
-          "memory": "256Mi"
+          "cpu": "50m",
+          "memory": "128Mi"
         },
         "limits": {
-          "cpu": "750m",
-          "memory": "1Gi"
+          "cpu": "500m",
+          "memory": "384Mi"
         }
       },
       "env": {
