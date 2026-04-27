@@ -1,0 +1,19 @@
+{{- if .Values.apps.frontend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tenant-platform.frontendName" . }}
+  namespace: {{ include "tenant-platform.namespace" . }}
+  labels:
+    {{- include "tenant-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "frontend"
+spec:
+  type: {{ .Values.apps.frontend.service.type }}
+  selector:
+    {{- include "tenant-platform.componentSelectorLabels" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "frontend") | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.apps.frontend.service.port }}
+      targetPort: {{ .Values.apps.frontend.service.targetPort }}
+      protocol: TCP
+{{- end }}

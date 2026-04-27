@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: tenant-platform
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: tenant-platform
+spec:
+  description: GitOps project for tenant frontend and CMS namespaces
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+    - namespace: tenant-*
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

@@ -1,0 +1,83 @@
+{{- if .Values.apps.cms.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tenant-platform.cmsName" . }}
+  namespace: {{ include "tenant-platform.namespace" . }}
+  labels:
+    {{- include "tenant-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "cms"
+spec:
+  replicas: {{ .Values.apps.cms.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tenant-platform.componentSelectorLabels" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "cms") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tenant-platform.componentSelectorLabels" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "cms") | nindent 8 }}
+      annotations:
+        checksum/runtime-config: {{ .Values.tenant.runtimeConfig | toJson | sha256sum }}
+        {{- range $key, $value := .Values.global.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "tenant-platform.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . | quote }}
+        {{- end }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.apps.cms.podSecurityContext | nindent 8 }}
+      containers:
+        - name: cms
+          image: "{{ .Values.apps.cms.image.repository }}:{{ .Values.apps.cms.image.tag }}"
+          imagePullPolicy: {{ .Values.apps.cms.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.apps.cms.containerPort }}
+              protocol: TCP
+          env:
+            - name: TENANT_ID
+              value: {{ .Values.tenant.tenantId | quote }}
+            - name: TENANT_SLUG
+              value: {{ .Values.tenant.slug | quote }}
+            - name: TENANT_PRIMARY_DOMAIN
+              value: {{ .Values.tenant.primaryDomain | quote }}
+            - name: TENANT_RELEASE_CHANNEL
+              value: {{ .Values.tenant.releaseChannel | quote }}
+            - name: TENANT_THEME_PRESET
+              value: {{ .Values.tenant.themePreset | quote }}
+            - name: TENANT_RUNTIME_CONFIG_JSON
+              value: {{ .Values.tenant.runtimeConfig | toJson | quote }}
+            - name: DATABASE_ENGINE
+              value: {{ .Values.tenant.database.engine | quote }}
+            - name: DATABASE_HOST
+              value: {{ .Values.tenant.database.host | quote }}
+            - name: DATABASE_PORT
+              value: {{ .Values.tenant.database.port | quote }}
+            - name: DATABASE_NAME
+              value: {{ .Values.tenant.database.databaseName | quote }}
+            {{- range $key, $value := .Values.apps.cms.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.tenant.database.credentialsSecretName | quote }}
+            {{- range .Values.apps.cms.envFromSecrets }}
+            - secretRef:
+                name: {{ . | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.apps.cms.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.apps.cms.securityContext | nindent 12 }}
+          livenessProbe:
+            {{- toYaml .Values.apps.cms.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.apps.cms.readinessProbe | nindent 12 }}
+{{- end }}

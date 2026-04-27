@@ -1,0 +1,19 @@
+{{- if .Values.apps.cms.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tenant-platform.cmsName" . }}
+  namespace: {{ include "tenant-platform.namespace" . }}
+  labels:
+    {{- include "tenant-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "cms"
+spec:
+  type: {{ .Values.apps.cms.service.type }}
+  selector:
+    {{- include "tenant-platform.componentSelectorLabels" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "cms") | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.apps.cms.service.port }}
+      targetPort: {{ .Values.apps.cms.service.targetPort }}
+      protocol: TCP
+{{- end }}

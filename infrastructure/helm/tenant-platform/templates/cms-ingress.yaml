@@ -1,0 +1,34 @@
+{{- if and .Values.ingress.enabled .Values.ingress.cms.enabled .Values.apps.cms.enabled .Values.ingress.cms.host }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "tenant-platform.cmsName" . }}
+  namespace: {{ include "tenant-platform.namespace" . }}
+  labels:
+    {{- include "tenant-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "cms"
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+    {{- range $key, $value := .Values.ingress.cms.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className | quote }}
+  tls:
+    - secretName: {{ .Values.tenant.tls.secretName | quote }}
+      hosts:
+        - {{ .Values.ingress.cms.host | quote }}
+  rules:
+    - host: {{ .Values.ingress.cms.host | quote }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.cms.path | quote }}
+            pathType: {{ .Values.ingress.cms.pathType | quote }}
+            backend:
+              service:
+                name: {{ include "tenant-platform.cmsName" . }}
+                port:
+                  number: {{ .Values.apps.cms.service.port }}
+{{- end }}

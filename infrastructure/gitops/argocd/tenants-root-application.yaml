@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tenant-platform-root
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: tenant-platform
+spec:
+  project: tenant-platform
+  source:
+    repoURL: https://git.example.com/platform/sito-commercianti.git
+    targetRevision: main
+    path: infrastructure/gitops/tenants
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true

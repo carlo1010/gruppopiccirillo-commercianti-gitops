@@ -1,0 +1,79 @@
+{{- if .Values.apps.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tenant-platform.frontendName" . }}
+  namespace: {{ include "tenant-platform.namespace" . }}
+  labels:
+    {{- include "tenant-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "frontend"
+spec:
+  replicas: {{ .Values.apps.frontend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "tenant-platform.componentSelectorLabels" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "frontend") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tenant-platform.componentSelectorLabels" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "frontend") | nindent 8 }}
+      annotations:
+        checksum/runtime-config: {{ .Values.tenant.runtimeConfig | toJson | sha256sum }}
+        {{- range $key, $value := .Values.global.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "tenant-platform.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.global.imagePullSecrets }}
+        - name: {{ . | quote }}
+        {{- end }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.apps.frontend.podSecurityContext | nindent 8 }}
+      containers:
+        - name: frontend
+          image: "{{ .Values.apps.frontend.image.repository }}:{{ .Values.apps.frontend.image.tag }}"
+          imagePullPolicy: {{ .Values.apps.frontend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.apps.frontend.containerPort }}
+              protocol: TCP
+          env:
+            - name: TENANT_ID
+              value: {{ .Values.tenant.tenantId | quote }}
+            - name: TENANT_SLUG
+              value: {{ .Values.tenant.slug | quote }}
+            - name: TENANT_PRIMARY_DOMAIN
+              value: {{ .Values.tenant.primaryDomain | quote }}
+            - name: TENANT_RELEASE_CHANNEL
+              value: {{ .Values.tenant.releaseChannel | quote }}
+            - name: TENANT_THEME_PRESET
+              value: {{ .Values.tenant.themePreset | quote }}
+            - name: TENANT_RUNTIME_CONFIG_JSON
+              value: {{ .Values.tenant.runtimeConfig | toJson | quote }}
+            - name: STRAPI_INTERNAL_URL
+              value: {{ printf "http://%s:%v" (include "tenant-platform.cmsName" .) .Values.apps.cms.service.port | quote }}
+            - name: NEXT_PUBLIC_STRAPI_URL
+              value: {{ printf "https://%s/cms-api" .Values.tenant.primaryDomain | quote }}
+            {{- range $key, $value := .Values.apps.frontend.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- if .Values.apps.frontend.envFromSecrets }}
+          envFrom:
+            {{- range .Values.apps.frontend.envFromSecrets }}
+            - secretRef:
+                name: {{ . | quote }}
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.apps.frontend.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.apps.frontend.securityContext | nindent 12 }}
+          livenessProbe:
+            {{- toYaml .Values.apps.frontend.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.apps.frontend.readinessProbe | nindent 12 }}
+{{- end }}

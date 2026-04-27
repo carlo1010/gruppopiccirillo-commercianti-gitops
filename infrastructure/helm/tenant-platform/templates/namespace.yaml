@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "tenant-platform.namespace" . }}
+  labels:
+    {{- include "tenant-platform.labels" . | nindent 4 }}
+  annotations:
+    tenant.platform/display-name: {{ .Values.tenant.displayName | quote }}
+    tenant.platform/spec-version: {{ .Values.tenant.specVersion | quote }}
+    {{- range $key, $value := .Values.tenant.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}

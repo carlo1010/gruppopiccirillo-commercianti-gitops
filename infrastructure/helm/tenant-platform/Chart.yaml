@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tenant-platform
+description: Multi-tenant runtime package for frontend and CMS in a dedicated namespace
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
