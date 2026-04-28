@@ -168,9 +168,29 @@
         }
       }
     },
-    "apps": {
+        "apps": {
       "type": "object",
-      "required": ["frontend", "cms"]
+      "required": ["frontend", "cms"],
+      "properties": {
+        "frontend": {
+          "type": "object",
+          "properties": {
+            "revisionHistoryLimit": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "cms": {
+          "type": "object",
+          "properties": {
+            "revisionHistoryLimit": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
     }
   }
 }

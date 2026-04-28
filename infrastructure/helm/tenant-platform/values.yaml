@@ -49,6 +49,7 @@ apps:
   frontend:
     enabled: true
     replicas: 2
+    revisionHistoryLimit: 1
     image:
       repository: "ghcr.io/example/gruppopiccirillo-commercianti-frontend"
       tag: "latest"
@@ -95,6 +96,7 @@ apps:
   cms:
     enabled: true
     replicas: 1
+    revisionHistoryLimit: 1
     image:
       repository: "ghcr.io/example/gruppopiccirillo-commercianti-cms"
       tag: "latest"

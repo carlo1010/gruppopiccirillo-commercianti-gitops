@@ -8,6 +8,7 @@ metadata:
     {{- include "tenant-platform.labels" . | nindent 4 }}
     app.kubernetes.io/component: "cms"
 spec:
+  revisionHistoryLimit: {{ .Values.apps.cms.revisionHistoryLimit }}
   replicas: {{ .Values.apps.cms.replicas }}
   selector:
     matchLabels:
