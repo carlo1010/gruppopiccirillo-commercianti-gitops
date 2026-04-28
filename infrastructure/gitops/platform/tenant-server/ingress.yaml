@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tenant-server
+  namespace: platform
+  labels:
+    app.kubernetes.io/part-of: tenant-platform
+    app.kubernetes.io/name: tenant-server
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - platform.commercianti.carloiodice.it
+      secretName: tenant-server-tls
+  rules:
+    - host: platform.commercianti.carloiodice.it
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tenant-server
+                port:
+                  number: 80

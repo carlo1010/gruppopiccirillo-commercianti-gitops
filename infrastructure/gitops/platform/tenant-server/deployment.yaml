@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenant-server
+  namespace: platform
+  labels:
+    app.kubernetes.io/part-of: tenant-platform
+    app.kubernetes.io/name: tenant-server
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tenant-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: tenant-platform
+        app.kubernetes.io/name: tenant-server
+    spec:
+      serviceAccountName: tenant-server
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: git-clone
+          image: alpine/git:2.45.2
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+          args:
+            - |
+              set -eu
+              rm -rf /workspace/*
+              git clone --branch main --single-branch https://github.com/carlo1010/gruppopiccirillo-commercianti-gitops.git /workspace
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      containers:
+        - name: tenant-server
+          image: ghcr.io/carlo1010/gruppopiccirillo-commercianti-tenant-server:main
+          imagePullPolicy: Always
+          workingDir: /workspace
+          ports:
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: tenant-server-secrets
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3001"
+            - name: TENANT_CONTROL_PLANE_STATE_PATH
+              value: /var/lib/platform-control-plane/state.json
+            - name: TENANT_DEFAULT_DATABASE_ENGINE
+              value: sqlite
+            - name: TENANT_DEFAULT_DATABASE_HOST
+              value: 127.0.0.1
+            - name: TENANT_DEFAULT_DATABASE_PORT
+              value: "5432"
+            - name: TENANT_DEFAULT_STORAGE_PROVIDER
+              value: local-pv
+            - name: TENANT_DEFAULT_STORAGE_BUCKET
+              value: tenant-media
+            - name: TENANT_STORAGE_CREDENTIALS_PREFIX
+              value: vault/tenants
+            - name: TENANT_DEFAULT_TLS_ISSUER
+              value: letsencrypt-prod
+            - name: TENANT_PUBLIC_INGRESS_TARGET
+              value: 95.110.143.33
+            - name: TENANT_PUBLIC_INGRESS_RECORD_TYPE
+              value: A
+            - name: TENANT_DNS_RECORD_TTL
+              value: "300"
+            - name: GITOPS_REMOTE_SYNC_ENABLED
+              value: "true"
+            - name: GITOPS_REPOSITORY_URL
+              value: https://github.com/carlo1010/gruppopiccirillo-commercianti-gitops.git
+            - name: GITOPS_TARGET_REVISION
+              value: main
+            - name: GITOPS_PUSH_BRANCH
+              value: main
+            - name: GITOPS_REMOTE_NAME
+              value: origin
+            - name: GITOPS_CHART_PATH
+              value: infrastructure/helm/tenant-platform
+            - name: GITOPS_ARGOCD_NAMESPACE
+              value: argocd
+            - name: GITOPS_APP_PROJECT
+              value: tenant-platform
+            - name: GITOPS_COMMIT_AUTHOR_NAME
+              value: platform-control-plane
+            - name: GITOPS_COMMIT_AUTHOR_EMAIL
+              value: platform@gruppopiccirillo.it
+            - name: TENANT_FRONTEND_IMAGE_REPOSITORY
+              value: ghcr.io/carlo1010/gruppopiccirillo-commercianti-frontend
+            - name: TENANT_FRONTEND_IMAGE_PULL_POLICY
+              value: Always
+            - name: TENANT_CMS_IMAGE_REPOSITORY
+              value: ghcr.io/carlo1010/gruppopiccirillo-commercianti-cms
+            - name: TENANT_CMS_IMAGE_PULL_POLICY
+              value: Always
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: state
+              mountPath: /var/lib/platform-control-plane
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: state
+          persistentVolumeClaim:
+            claimName: tenant-server-state
+        - name: tmp
+          emptyDir: {}

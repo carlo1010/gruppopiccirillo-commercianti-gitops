@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tenant-server
+  namespace: platform
+  labels:
+    app.kubernetes.io/part-of: tenant-platform
+spec:
+  secretName: tenant-server-tls
+  duration: 2160h
+  renewBefore: 360h
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  privateKey:
+    algorithm: RSA
+    size: 2048
+  dnsNames:
+    - platform.commercianti.carloiodice.it

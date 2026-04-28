@@ -12,6 +12,8 @@ spec:
   destinations:
     - namespace: argocd
       server: https://kubernetes.default.svc
+    - namespace: platform
+      server: https://kubernetes.default.svc
     - namespace: tenant-*
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
