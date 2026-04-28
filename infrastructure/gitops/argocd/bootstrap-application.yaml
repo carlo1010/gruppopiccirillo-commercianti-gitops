@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tenant-platform-bootstrap
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: tenant-platform
+spec:
+  project: tenant-platform
+  source:
+    repoURL: https://github.com/carlo1010/gruppopiccirillo-commercianti-gitops.git
+    targetRevision: main
+    path: infrastructure/gitops/bootstrap
+    directory:
+      recurse: true
+      include: '{*.yaml,**/*.yaml}'
+      exclude: '{*.json,**/*.json}'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
